@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  body {
+    @apply text-gray-900 bg-gray-50 transition-colors duration-200;
+  }
+  
+  html.high-contrast {
+    body {
+      @apply bg-black text-white;
+    }
+    .bg-white {
+      @apply !bg-black !text-white !border-white !border-2;
+    }
+    .text-gray-900, .text-gray-800, .text-gray-600, .text-gray-500 {
+      @apply !text-white;
+    }
+    .bg-primary {
+      @apply !bg-yellow-400 !text-black;
+    }
+    .text-primary {
+      @apply !text-yellow-400;
+    }
+  }
+}

@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PATIENT
+  DOCTOR
+}
+
+enum ConsultationStatus {
+  ACTIVE
+  COMPLETED
+}
+
+enum MessageType {
+  TEXT
+  SPEECH_TRANSCRIPTION
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  createdAt    DateTime @default(now())
+
+  consultationsAsPatient Consultation[] @relation("PatientConsultations")
+  consultationsAsDoctor  Consultation[] @relation("DoctorConsultations")
+  messages               Message[]
+}
+
+model Consultation {
+  id        String             @id @default(uuid())
+  patientId String
+  doctorId  String
+  status    ConsultationStatus @default(ACTIVE)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  patient  User      @relation("PatientConsultations", fields: [patientId], references: [id])
+  doctor   User      @relation("DoctorConsultations", fields: [doctorId], references: [id])
+  messages Message[]
+}
+
+model Message {
+  id             String      @id @default(uuid())
+  consultationId String
+  senderId       String
+  senderRole     Role
+  content        String
+  messageType    MessageType @default(TEXT)
+  createdAt      DateTime    @default(now())
+
+  consultation Consultation @relation(fields: [consultationId], references: [id])
+  sender       User         @relation(fields: [senderId], references: [id])
+}
